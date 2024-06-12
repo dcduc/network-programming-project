@@ -2,13 +2,6 @@ from customtkinter import *
 import database
 
 
-# def login():
-#     print("Login")
-
-# def register():
-#     print("Register")
-
-
 class LoginRegister(CTkFrame):
     def __init__(self, parent):
         self.parent = parent
@@ -147,7 +140,19 @@ class LoginRegister(CTkFrame):
     def login(self):
         ID, passwd = self.id_entry.get(), self.pass_entry.get()
         # Truy vấn
+        self.client_id = database.execute_command(
+            f"SELECT id FROM remote_desktop_app.clients WHERE username = '{ID}' AND password = '{passwd}'".encode(),
+            socket_db,
+        )
 
     def register(self):
         ID, passwd = self.id_entry2.get(), self.pass_entry2.get()
+        assert passwd == self.confirm_pass_entry.get(), "Password not match"
         # Truy vấn
+        database.execute_command(
+            f"INSERT INTO remote_desktop_app.clients (username, password) VALUES ('{ID}', '{passwd}')".encode(),
+            socket_db,
+        )
+
+    # def get_client_id(self):
+    #     return self.client_id

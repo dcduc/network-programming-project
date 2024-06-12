@@ -113,8 +113,7 @@ class ClientApp:
         temp = shutdown_UI(self.client_socket, self.app)
 
     def login_register(self):
-        temp = LoginRegister(self.app)
-        
+        self.login_register = LoginRegister(self.app)
 
     def multitask(self):
         try:
@@ -193,7 +192,7 @@ class ClientApp:
         self.client_socket.connect(server_address)
         messagebox.showinfo(message="Kết nối thành công!")
         # write to log database
-        client_id = 123
+        client_id = self.login_register.client_id
         mac_address = database.execute_command(
             f"select mac_address from remote_desktop_app.servers where id='{self.host_id}'".encode(),
             socket_db,
