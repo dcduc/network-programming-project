@@ -9,6 +9,7 @@ from LoginRegister import *
 from PIL import Image, ImageTk
 import sys
 import database
+import time
 
 BUFSIZ = 1024 * 4
 
@@ -30,20 +31,57 @@ class ClientApp:
         self.main_hp = None
 
     def generateMainUI(self):
-        title_label = CTkLabel( self.app, text="Client", font=("Inria Sans Bold", 24), width=50, text_color="#FFFFFF", )
+        title_label = CTkLabel(
+            self.app,
+            text="Client",
+            font=("Inria Sans Bold", 24),
+            width=50,
+            text_color="#FFFFFF",
+        )
         title_label.grid(row=0, column=0, columnspan=2, pady=10)
 
-        id_label = CTkLabel( self.app, text="ID:", anchor="e", font=("Inria Sans", 16), width=30, height=2, )
+        id_label = CTkLabel(
+            self.app,
+            text="ID:",
+            anchor="e",
+            font=("Inria Sans", 16),
+            width=30,
+            height=2,
+        )
         id_label.grid(row=1, column=0, sticky="w", padx=10, pady=10)
-        self.id_entry = CTkEntry(self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID...")
+        self.id_entry = CTkEntry(
+            self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID..."
+        )
         self.id_entry.grid(row=1, column=1, padx=10)
 
-        password_label = CTkLabel( self.app, text="Password:", anchor="e", font=("Inria Sans", 16), width=30, height=2, )
+        password_label = CTkLabel(
+            self.app,
+            text="Password:",
+            anchor="e",
+            font=("Inria Sans", 16),
+            width=30,
+            height=2,
+        )
         password_label.grid(row=2, column=0, sticky="w", padx=5, pady=5)
-        self.pass_entry = CTkEntry( self.app, show="*", width=200, font=("Inria Sans", 12), placeholder_text="Enter password...", )
+        self.pass_entry = CTkEntry(
+            self.app,
+            show="*",
+            width=200,
+            font=("Inria Sans", 12),
+            placeholder_text="Enter password...",
+        )
         self.pass_entry.grid(row=2, column=1, padx=10)
 
-        connect_button = CTkButton( self.app, text="Connect", width=30, font=("Inria Sans", 16), command=self.connect, corner_radius=15, fg_color="#8AFF6C", text_color="#123456", )
+        connect_button = CTkButton(
+            self.app,
+            text="Connect",
+            width=30,
+            font=("Inria Sans", 16),
+            command=self.connect,
+            corner_radius=15,
+            fg_color="#8AFF6C",
+            text_color="#123456",
+        )
         connect_button.grid(row=3, column=0, columnspan=2, pady=20)
 
     def getInputValue(self):
@@ -69,11 +107,11 @@ class ClientApp:
 
     def screenshot(self):
         self.client_socket.sendall(bytes("SCREENSHOT", "utf8"))
-    
+
     def shutdown(self):
         self.client_socket.sendall(bytes("SHUTDOWN", "utf8"))
         temp = shutdown_UI(self.client_socket, self.app)
-    
+
     def login_register(self):
         LoginRegisterUI(self.client_socket, self.app)
 
@@ -86,7 +124,14 @@ class ClientApp:
             key_con.connect((self.ip, self.port))
             mouse_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             mouse_con.connect((self.ip, self.port))
-            temp = Control(self.app, self.client_socket, screen_con, key_con, mouse_con, self.host_pass)
+            temp = Control(
+                self.app,
+                self.client_socket,
+                screen_con,
+                key_con,
+                mouse_con,
+                self.host_pass,
+            )
             temp.info.configure(command=lambda: self.back(temp))
         except:
             messagebox.showerror(message="Kết nối thất bại!")
@@ -108,8 +153,8 @@ class ClientApp:
                 if sys.argv[1] == "--remote":
                     self.host_id, self.host_pass = self.getInputValue()
                     f, socket_db = database.connect(
-                        b"client",
-                        b"client",
+                        b"dcduc",
+                        b"CongDuc_1608",
                         "dcduc.mysql.database.azure.com",
                         3306,
                         b"remote_desktop_app",
@@ -118,11 +163,15 @@ class ClientApp:
                         print("Authentication failed!")
                     self.port = int(
                         database.execute_command(
-                            f"select remote_desktop_app.get_port('{self.host_id}','{self.host_pass}')".encode(),
+                            f"select port from remote_desktop_app.servers where id='{self.host_id}' and password='{self.host_pass}'".encode(),
                             socket_db,
                         )
                     )
-                    self.ip = "172.207.92.76"
+                    self.ip = database.execute_command(
+                        f"select ip_address from remote_desktop_app.vps where connections=(select min(connections) from vps)".encode(),
+                        socket_db,
+                    )
+                    print(self.ip, self.port)
             except ConnectionRefusedError:
                 messagebox.showerror(message="Kết nối thất bại!")
                 if self.client_socket:
@@ -142,6 +191,16 @@ class ClientApp:
         server_address = (self.ip, self.port)
         self.client_socket.connect(server_address)
         messagebox.showinfo(message="Kết nối thành công!")
+        # write to log database
+        client_id = 123
+        mac_address = database.execute_command(
+            f"select mac_address from remote_desktop_app.servers where id='{self.host_id}'".encode(),
+            socket_db,
+        )
+        database.execute_command(
+            f"insert into remote_desktop_app.logs (`client_id`, `server_id`, `date`) values ('{client_id}', '{mac_address}', {time.time()})".encode(),
+            socket_db,
+        )
         self.showMainUI()
         self.app.mainloop()
 
