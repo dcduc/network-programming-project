@@ -121,6 +121,8 @@ def get_result(byte_sequence):
         else:
             flush_ascii_sequence()
     flush_ascii_sequence()
+    if len(ascii_sequences) == 0:
+        return 0
     return ascii_sequences[0]
 
 
@@ -215,8 +217,10 @@ def execute_command(command, client):
                 print(">> Packet data: %s" % packet_data.decode("ascii", "ignore"))
                 start_packet_position = end_packet_position + packet_size + 1
                 i = i + 1
+
         return get_result(data[data.find(b"\xfe") + 4 :])
     else:
+        print(data)
         return get_result(data[data.find(b"\xfe") + 4 :])
 
 
