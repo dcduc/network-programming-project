@@ -5,6 +5,7 @@ from FileControlClient import *
 from MultiTask import *
 from HomescreenGUI import *
 from Shutdown import *
+from LoginRegister import *
 from PIL import Image, ImageTk
 import sys
 import database
@@ -29,57 +30,20 @@ class ClientApp:
         self.main_hp = None
 
     def generateMainUI(self):
-        title_label = CTkLabel(
-            self.app,
-            text="Client",
-            font=("Inria Sans Bold", 24),
-            width=50,
-            text_color="#FFFFFF",
-        )
+        title_label = CTkLabel( self.app, text="Client", font=("Inria Sans Bold", 24), width=50, text_color="#FFFFFF", )
         title_label.grid(row=0, column=0, columnspan=2, pady=10)
 
-        id_label = CTkLabel(
-            self.app,
-            text="ID:",
-            anchor="e",
-            font=("Inria Sans", 16),
-            width=30,
-            height=2,
-        )
+        id_label = CTkLabel( self.app, text="ID:", anchor="e", font=("Inria Sans", 16), width=30, height=2, )
         id_label.grid(row=1, column=0, sticky="w", padx=10, pady=10)
-        self.id_entry = CTkEntry(
-            self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID..."
-        )
+        self.id_entry = CTkEntry(self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID...")
         self.id_entry.grid(row=1, column=1, padx=10)
 
-        password_label = CTkLabel(
-            self.app,
-            text="Password:",
-            anchor="e",
-            font=("Inria Sans", 16),
-            width=30,
-            height=2,
-        )
+        password_label = CTkLabel( self.app, text="Password:", anchor="e", font=("Inria Sans", 16), width=30, height=2, )
         password_label.grid(row=2, column=0, sticky="w", padx=5, pady=5)
-        self.pass_entry = CTkEntry(
-            self.app,
-            show="*",
-            width=200,
-            font=("Inria Sans", 12),
-            placeholder_text="Enter password...",
-        )
+        self.pass_entry = CTkEntry( self.app, show="*", width=200, font=("Inria Sans", 12), placeholder_text="Enter password...", )
         self.pass_entry.grid(row=2, column=1, padx=10)
 
-        connect_button = CTkButton(
-            self.app,
-            text="Connect",
-            width=30,
-            font=("Inria Sans", 16),
-            command=self.connect,
-            corner_radius=15,
-            fg_color="#8AFF6C",
-            text_color="#123456",
-        )
+        connect_button = CTkButton( self.app, text="Connect", width=30, font=("Inria Sans", 16), command=self.connect, corner_radius=15, fg_color="#8AFF6C", text_color="#123456", )
         connect_button.grid(row=3, column=0, columnspan=2, pady=20)
 
     def getInputValue(self):
@@ -109,7 +73,9 @@ class ClientApp:
     def shutdown(self):
         self.client_socket.sendall(bytes("SHUTDOWN", "utf8"))
         temp = shutdown_UI(self.client_socket, self.app)
-        
+    
+    def login_register(self):
+        LoginRegisterUI(self.client_socket, self.app)
 
     def multitask(self):
         try:
@@ -183,6 +149,7 @@ class ClientApp:
 if __name__ == "__main__":
     try:
         client = ClientApp()
+        client.login_register()
         client.generateMainUI()
         client.app.mainloop()
         client.connect()
