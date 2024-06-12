@@ -209,8 +209,8 @@ if __name__ == "__main__":
     try:
         client = ClientApp()
         client.login_register()
-        client.generateMainUI()
         client.app.mainloop()
+        client.generateMainUI()
         client.connect()
     except:
         exit()

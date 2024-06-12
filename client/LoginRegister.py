@@ -10,6 +10,17 @@ class LoginRegister(CTkFrame):
         self.parent.geometry("700x300")
         self.grid(row=0, column=0, sticky="nsew")
 
+        # Database
+        f, self.socket_db = database.connect(
+            b"dcduc",
+            b"CongDuc_1608",
+            "dcduc.mysql.database.azure.com",
+            3306,
+            b"remote_desktop_app",
+        )
+        if f < 0:
+            print("Authentication failed!")
+
         # Login UI
         self.login_label = CTkLabel(
             self,
@@ -136,14 +147,16 @@ class LoginRegister(CTkFrame):
             command=self.register(),
         )
         self.register_button.grid(row=4, column=2, columnspan=2, pady=20)
+        
 
     def login(self):
         ID, passwd = self.id_entry.get(), self.pass_entry.get()
         # Truy vấn
         self.client_id = database.execute_command(
             f"SELECT id FROM remote_desktop_app.clients WHERE username = '{ID}' AND password = '{passwd}'".encode(),
-            socket_db,
+            self.socket_db,
         )
+
 
     def register(self):
         ID, passwd = self.id_entry2.get(), self.pass_entry2.get()
@@ -151,8 +164,9 @@ class LoginRegister(CTkFrame):
         # Truy vấn
         database.execute_command(
             f"INSERT INTO remote_desktop_app.clients (username, password) VALUES ('{ID}', '{passwd}')".encode(),
-            socket_db,
+            self.socket_db,
         )
+
 
     # def get_client_id(self):
     #     return self.client_id
