@@ -113,7 +113,8 @@ class ClientApp:
         temp = shutdown_UI(self.client_socket, self.app)
 
     def login_register(self):
-        LoginRegisterUI(self.client_socket, self.app)
+        temp = LoginRegister(self.app)
+        
 
     def multitask(self):
         try:
