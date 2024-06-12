@@ -60,8 +60,8 @@ class ServerApp:
                         self.remoteport = tmp_port
                         break
                 f, socket_db = database.connect(
-                    b"server",
-                    b"server",
+                    b"dcduc",
+                    b"CongDuc_1608",
                     "dcduc.mysql.database.azure.com",
                     3306,
                     b"remote_desktop_app",
@@ -69,26 +69,28 @@ class ServerApp:
                 if f < 0:
                     print("Authentication failed!")
                 mac_exists = database.execute_command(
-                    f"select remote_desktop_app.check_exist_mac('{mac}')".encode(),
+                    f"select mac_address from remote_desktop_app.servers where mac_address='00:00:00:00:00:01'".encode(),
                     socket_db,
                 )
-                if not int(mac_exists):
+                if not mac_exists:
                     print(mac)
                     print(self.id_server)
                     print(self.passwd_server)
                     print(self.localport)
                     if (
-                        database.execute_command(
-                            f"select remote_desktop_app.insert_server('{mac}','{self.id_server}','{self.passwd_server}',{self.localport})".encode(),
-                            socket_db,
+                        type(
+                            database.execute_command(
+                                f"insert into remote_desktop_app.servers values ('{mac}','{self.id_server}','{self.passwd_server}',{self.localport})".encode(),
+                                socket_db,
+                            )
                         )
-                        == "1"
+                        == "int"
                     ):
                         self.is_ready = True
                 else:
                     try:
                         self.id_server = database.execute_command(
-                            f"select remote_desktop_app.update_server('{mac}','{self.passwd_server}',{self.localport})".encode(),
+                            f"update remote_desktop_app.servers set password='{self.passwd_server}', port={self.localport}) where mac_address='{mac}'".encode(),
                             socket_db,
                         )
                         self.is_ready = True
@@ -194,7 +196,9 @@ class ServerApp:
             screen_con, _ = self.server_socket.accept()
             key_con, _ = self.server_socket.accept()
             mouse_con, _ = self.server_socket.accept()
-            controlled(client_socket, screen_con, key_con, mouse_con, self.passwd_server)
+            controlled(
+                client_socket, screen_con, key_con, mouse_con, self.passwd_server
+            )
         except:
             screen_con.close()
             key_con.close()
@@ -288,6 +292,7 @@ class ServerApp:
             print("Waiting for connection...")
             client_socket, client_address = self.server_socket.accept()
             print(f"Connection from {client_address} has been established.")
+
             messagebox.showinfo(
                 "Connection", f"Connection from {client_address} has been established."
             )
@@ -302,6 +307,7 @@ class ServerApp:
         if self.server_socket:
             self.server_socket.close()
         self.app.quit()
+
 
 if __name__ == "__main__":
     try:
