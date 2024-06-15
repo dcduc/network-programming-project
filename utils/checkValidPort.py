@@ -19,7 +19,7 @@ def get_listening_ports_server():
     return listening_ports
 
 def get_listening_ports_vps():
-    pem_file = "C:\\Users\\dcduc\\Downloads\\duynv.pem"
+    pem_file = "C:\\Users\\duyng\\Downloads\\duynv.pem"
     ssh_user = "nvm"
     ssh_host = "172.207.92.76"
     ssh_command = [

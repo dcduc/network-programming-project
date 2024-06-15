@@ -13,8 +13,9 @@ def showTree(server_socket):
         if os.path.isdir(path):
             ListDirectoryTree.append(path)
     data = pickle.dumps(ListDirectoryTree)
+    print(str(len(data)))
     server_socket.sendall(str(len(data)).encode())
-    time.sleep(0.1)
+    time.sleep(0.2)
     server_socket.sendall(data)
 
 def sendListDirs(server_socket):

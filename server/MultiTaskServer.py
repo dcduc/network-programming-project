@@ -50,8 +50,8 @@ def send_img(screen_connect):
         image_byte_array = image_byte_array.getvalue()
 
         screen_connect.sendall(len(image_byte_array).to_bytes(4))
-        encrypted_image_byte_array = ascon_encrypt(key = KEY, nonce = NONCE, plaintext=image_byte_array)
-        screen_connect.sendall(encrypted_image_byte_array)
+        #encrypted_image_byte_array = ascon_encrypt(key = KEY, nonce = NONCE, plaintext=image_byte_array, associateddata=b"")
+        screen_connect.sendall(image_byte_array)
          
         status = screen_connect.recv(BUFFERSIZE).decode()
         if "STOP" in status:

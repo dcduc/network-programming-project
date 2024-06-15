@@ -15,7 +15,7 @@ BUFSIZ = 1024 * 4
 
 
 class ClientApp:
-    def __init__(self):
+    def __init__(self, client_id):
         self.client_socket = None
         self.host_id = None
         self.host_pass = None
@@ -29,7 +29,9 @@ class ClientApp:
         self.id_entry = None
         self.pass_entry = None
         self.main_hp = None
-
+        self.client_id = client_id
+        self.socket_db = None
+        
     def generateMainUI(self):
         title_label = CTkLabel(
             self.app,
@@ -90,7 +92,7 @@ class ClientApp:
     def back(self, temp):
         temp.destroy()
         self.main_hp.tkraise()
-        self.app.geometry("480x140")
+        self.app.geometry("480x230")
         self.client_socket.sendall(bytes("QUIT", "utf8"))
 
     def fileControl(self):
@@ -103,6 +105,15 @@ class ClientApp:
         self.main_hp.destroy()
         self.app.destroy()
         self.client_socket.close()
+        try:
+            database.execute_command(
+                f"update remote_desktop_app.vps set connections=connections-1 where ip_address='{self.ip}'".encode(),
+                self.socket_db,
+            )
+        except Exception as e:
+            print(e)
+            if self.client_socket:
+                self.client_socket.close()
         exit()
 
     def screenshot(self):
@@ -111,9 +122,6 @@ class ClientApp:
     def shutdown(self):
         self.client_socket.sendall(bytes("SHUTDOWN", "utf8"))
         temp = shutdown_UI(self.client_socket, self.app)
-
-    def login_register(self):
-        self.login_register = LoginRegister(self.app)
 
     def multitask(self):
         try:
@@ -152,7 +160,7 @@ class ClientApp:
             try:
                 if sys.argv[1] == "--remote":
                     self.host_id, self.host_pass = self.getInputValue()
-                    f, socket_db = database.connect(
+                    f, self.socket_db = database.connect(
                         b"dcduc",
                         b"CongDuc_1608",
                         "dcduc.mysql.database.azure.com",
@@ -164,12 +172,12 @@ class ClientApp:
                     self.port = int(
                         database.execute_command(
                             f"select port from remote_desktop_app.servers where id='{self.host_id}' and password='{self.host_pass}'".encode(),
-                            socket_db,
+                            self.socket_db,
                         )
                     )
                     self.ip = database.execute_command(
-                        f"select ip_address from remote_desktop_app.vps where connections=(select min(connections) from vps)".encode(),
-                        socket_db,
+                        f"select remote_address from remote_desktop_app.servers where id='{self.host_id}' and password='{self.host_pass}'".encode(),
+                        self.socket_db,
                     )
                     print(self.ip, self.port)
             except ConnectionRefusedError:
@@ -183,34 +191,46 @@ class ClientApp:
                     self.client_socket.close()
                 exit()
         else:
-            self.ip, self.port = self.getInputValue()
+            # self.ip, self.port = self.getInputValue()
+            self.ip = "127.0.0.1"
             self.host_pass = "0" * 16
-            self.port = int(self.port)
+            self.port = 4444
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_address = (self.ip, self.port)
+        print("ip_port:", server_address)
         self.client_socket.connect(server_address)
         messagebox.showinfo(message="Kết nối thành công!")
         # write to log database
-        client_id = self.login_register.client_id
-        mac_address = database.execute_command(
-            f"select mac_address from remote_desktop_app.servers where id='{self.host_id}'".encode(),
-            socket_db,
-        )
-        database.execute_command(
-            f"insert into remote_desktop_app.logs (`client_id`, `server_id`, `date`) values ('{client_id}', '{mac_address}', {time.time()})".encode(),
-            socket_db,
-        )
+        
+        if len(sys.argv) > 1:
+            try:
+                mac_address = database.execute_command(
+                    f"select mac_address from remote_desktop_app.servers where id='{self.host_id}'".encode(),
+                    self.socket_db,
+                )
+                database.execute_command(
+                    f"insert into remote_desktop_app.logs (`client_id`, `server_id`, `date`) values ('{self.client_id}', '{mac_address}', NOW())".encode(),
+                    self.socket_db,
+                )
+            except Exception as e:
+                print(e)
+                if self.client_socket:
+                    self.client_socket.close()
+                exit()
+        
         self.showMainUI()
         self.app.mainloop()
 
 
 if __name__ == "__main__":
     try:
-        client = ClientApp()
-        client.login_register()
-        client.app.mainloop()
+        login_register = LoginRegister()
+        login_register.app.mainloop()
+        client_id = login_register.client_id
+        client = ClientApp(client_id=client_id)
         client.generateMainUI()
+        client.app.mainloop()
         client.connect()
     except:
         exit()

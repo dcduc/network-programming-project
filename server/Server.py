@@ -27,12 +27,11 @@ def get_wifi_mac_address():
                 ):  # Kiểm tra tên interface phù hợp
                     return addr.address
 
-
 class ServerApp:
     def __init__(self):
         self.server_socket = None
         self.running = False
-        self.key_path = "C:\\Users\\dcduc\\Downloads\\duynv.pem"
+        self.key_path = "C:\\Users\\duyng\\Downloads\\duynv.pem"
         self.localport = 4444
         self.localhost = "127.0.0.1"
         self.remoteport = 4444
@@ -45,21 +44,21 @@ class ServerApp:
         self.app.resizable(False, False)
         self.id_server, self.passwd_server = genIDPassword()
         self.is_ready = False
-
+        self.socket_db = None
         if len(sys.argv) > 1 and sys.argv[1] == "--remote":
             try:
                 mac = get_wifi_mac_address()
                 listening_ports = get_listening_ports()
-                print(mac)
-                print(self.id_server, self.passwd_server)
-                print(self.localport)
+                # print(mac)
+                # print(self.id_server, self.passwd_server)
+                # print(self.localport)
                 while True:
                     tmp_port = randint(1024, 65000)
                     if tmp_port not in listening_ports:
                         self.localport = tmp_port
                         self.remoteport = tmp_port
                         break
-                f, socket_db = database.connect(
+                f, self.socket_db = database.connect(
                     b"dcduc",
                     b"CongDuc_1608",
                     "dcduc.mysql.database.azure.com",
@@ -68,19 +67,24 @@ class ServerApp:
                 )
                 if f < 0:
                     print("Authentication failed!")
+                self.remotehost = database.execute_command(
+                    f"select ip_address from remote_desktop_app.vps where connections=(select min(connections) from vps)".encode(),
+                    self.socket_db,
+                )
+                # print(self.remotehost)
                 mac_exists = database.execute_command(
-                    f"select mac_address from remote_desktop_app.servers where mac_address='00:00:00:00:00:01'".encode(),
-                    socket_db,
+                    f"select mac_address from remote_desktop_app.servers where mac_address='{mac}'".encode(),
+                    self.socket_db,
                 )
                 if not mac_exists:
-                    print(mac)
-                    print(self.id_server)
-                    print(self.passwd_server)
-                    print(self.localport)
+                    # print(mac)
+                    # print(self.id_server)
+                    # print(self.passwd_server)
+                    # print(self.localport)
                     if (
                         type(
                             database.execute_command(
-                                f"insert into remote_desktop_app.servers values ('{mac}','{self.id_server}','{self.passwd_server}',{self.localport})".encode(),
+                                f"insert into remote_desktop_app.servers (`mac_address`, `id`, `password`, `port`, `remote_address`) values ('{mac}','{self.id_server}','{self.passwd_server}',{self.localport}, '{self.remotehost}')".encode(),
                                 socket_db,
                             )
                         )
@@ -89,9 +93,13 @@ class ServerApp:
                         self.is_ready = True
                 else:
                     try:
+                        database.execute_command(
+                            f"update remote_desktop_app.servers set password='{self.passwd_server}', port={self.localport}, remote_address='{self.remotehost}' where mac_address='{mac}'".encode(),
+                            self.socket_db,
+                        )
                         self.id_server = database.execute_command(
-                            f"update remote_desktop_app.servers set password='{self.passwd_server}', port={self.localport}) where mac_address='{mac}'".encode(),
-                            socket_db,
+                            f"select id from remote_desktop_app.servers where mac_address='{mac}'".encode(),
+                            self.socket_db,
                         )
                         self.is_ready = True
                     except Exception as e:
@@ -273,10 +281,10 @@ class ServerApp:
             print("Open server")
             try:
                 self.passwd_server = "0" * 16
-                self.localport = int(input("Enter port: "))
+                self.localport = 4444
                 self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 # self.server_socket.bind((self.localhost, self.localport))
-                self.server_socket.bind(("100.117.59.11", self.localport))
+                self.server_socket.bind(("127.0.0.1", self.localport))
                 self.server_socket.listen(5)
                 self.running = True
                 print(f"Server is listening on {self.localhost}:{self.localport}...")
@@ -292,12 +300,16 @@ class ServerApp:
             print("Waiting for connection...")
             client_socket, client_address = self.server_socket.accept()
             print(f"Connection from {client_address} has been established.")
-
+            if len(sys.argv) > 1:
+                database.execute_command(
+                    f"update remote_desktop_app.vps set connections=connections+1 where ip_address='{self.remotehost}'".encode(), self.socket_db
+                )
             messagebox.showinfo(
                 "Connection", f"Connection from {client_address} has been established."
             )
             self.handle_client(client_socket)
-        except:
+        except Exception as e:
+            print(e)
             self.server_socket.close()
             self.running = False
             exit()

@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `servers` (
     `id` varchar(10) NOT NULL,
     `password` varchar(9) NOT NULL,
     `port` int NOT NULL,
+    `remote_address` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`mac_address`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
@@ -58,3 +59,28 @@ VALUES
         '123456789',
         4444
     );
+
+INSERT INTO
+    `vps` (`ip_address`, `connections`)
+VALUES
+    ('172.207.92.76', 0);
+
+INSERT INTO
+    `vps` (`ip_address`, `connections`)
+VALUES
+    ('172.207.92.77', 0);
+
+INSERT INTO
+    `vps` (`ip_address`, `connections`)
+VALUES
+    ('172.207.92.78', 1);
+
+INSERT INTO
+    `clients` (`username`, `password`)
+VALUES
+    ('admin', 'admin');
+
+INSERT INTO
+    `logs` (`client_id`, `server_id`, `date`)
+VALUES
+    (1, '00:00:00:00:00:00', '2021-01-01 00:00:00');

@@ -9,11 +9,14 @@ class sshtunnel():
         self.remotehost = remotehost
         self.key_path = key_path                                         
     def run(self):
-        exit_status = subprocess.getoutput([
-            'ssh', '-i',
-                   str(self.key_path), '-R', str(self.remoteport) + ':' + self.localhost + ':' +
-            str(self.localport),
-                   self.remoteuser + '@' + self.remotehost])
-        if exit_status != 0:
-            return "SSH Tunnel failed"
-            
+        try:
+            exit_status = subprocess.call([
+                'ssh', '-i',
+                    str(self.key_path), '-R', str(self.remoteport) + ':' + self.localhost + ':' +
+                str(self.localport),
+                    self.remoteuser + '@' + self.remotehost])
+            if exit_status != 0:
+                return "SSH Tunnel failed"
+        except Exception as e:
+                print(e)
+                return "SSH Tunnel failed"
