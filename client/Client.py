@@ -117,6 +117,7 @@ class ClientApp:
 
     def screenshot(self):
         self.client_socket.sendall(bytes("SCREENSHOT", "utf8"))
+        recv_screenshot(self.client_socket)
 
     def shutdown(self):
         self.client_socket.sendall(bytes("SHUTDOWN", "utf8"))
