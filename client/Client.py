@@ -93,6 +93,7 @@ class ClientApp:
         temp.destroy()
         self.main_hp.tkraise()
         self.app.geometry("480x230")
+        self.app.geometry("480x230")
         self.client_socket.sendall(bytes("QUIT", "utf8"))
 
     def fileControl(self):
@@ -229,7 +230,12 @@ if __name__ == "__main__":
         login_register.app.mainloop()
         client_id = login_register.client_id
         client = ClientApp(client_id=client_id)
+        login_register = LoginRegister()
+        login_register.app.mainloop()
+        client_id = login_register.client_id
+        client = ClientApp(client_id=client_id)
         client.generateMainUI()
+        client.app.mainloop()
         client.app.mainloop()
         client.connect()
     except:

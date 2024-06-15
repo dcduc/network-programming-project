@@ -85,6 +85,7 @@ class ServerApp:
                         type(
                             database.execute_command(
                                 f"insert into remote_desktop_app.servers (`mac_address`, `id`, `password`, `port`, `remote_address`) values ('{mac}','{self.id_server}','{self.passwd_server}',{self.localport}, '{self.remotehost}')".encode(),
+                                f"insert into remote_desktop_app.servers (`mac_address`, `id`, `password`, `port`, `remote_address`) values ('{mac}','{self.id_server}','{self.passwd_server}',{self.localport}, '{self.remotehost}')".encode(),
                                 socket_db,
                             )
                         )
