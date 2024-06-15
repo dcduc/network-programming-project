@@ -189,7 +189,7 @@ class ServerApp:
                 elif "FILE CONTROL" in msg:
                     file_control(client_socket, self.passwd_server)
                 elif "SCREENSHOT" in msg:
-                    send_screenshot(client_socket)
+                    recv_screenshot(client_socket)
                 elif "SHUTDOWN" in msg:
                     shutdown(client_socket)
                 elif "QUIT" in msg:

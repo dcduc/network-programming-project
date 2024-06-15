@@ -227,10 +227,10 @@ if __name__ == "__main__":
         login_register.app.mainloop()
         client_id = login_register.client_id
         client = ClientApp(client_id=client_id)
-        login_register = LoginRegister()
-        login_register.app.mainloop()
-        client_id = login_register.client_id
-        client = ClientApp(client_id=client_id)
+        # login_register = LoginRegister()
+        # login_register.app.mainloop()
+        # client_id = login_register.client_id
+        # client = ClientApp(client_id=client_id)
         client.generateMainUI()
         client.app.mainloop()
         client.connect()
