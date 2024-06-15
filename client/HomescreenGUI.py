@@ -1,6 +1,5 @@
 from customtkinter import *
 
-
 class HomescreenUI(CTkFrame):
     def __init__(self, parent):
         self.parent = parent

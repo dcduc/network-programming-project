@@ -16,7 +16,6 @@ def ascon_encrypt(key, nonce, associateddata, plaintext, variant="Ascon-128"):
     tag = ascon_finalize(S, rate, a, key)
     return ciphertext + tag
 
-
 def ascon_decrypt(key, nonce, associateddata, ciphertext, variant="Ascon-128"):
     assert variant in ["Ascon-128", "Ascon-128a", "Ascon-80pq"]
     assert(len(nonce) == 16 and (len(key) == 16 or (len(key) == 20 and variant == "Ascon-80pq")))
@@ -51,7 +50,6 @@ def ascon_initialize(S, k, rate, a, b, key, nonce):
     S[4] ^= zero_key[4]
     if debug: printstate(S, "initialization:")
 
-
 def ascon_process_associated_data(S, b, rate, associateddata):
     if len(associateddata) > 0:
         a_zeros = rate - (len(associateddata) % rate) - 1
@@ -67,7 +65,6 @@ def ascon_process_associated_data(S, b, rate, associateddata):
 
     S[4] ^= 1
     if debug: printstate(S, "process associated data:")
-
 
 def ascon_process_plaintext(S, b, rate, plaintext):
     p_lastlen = len(plaintext) % rate
@@ -98,7 +95,6 @@ def ascon_process_plaintext(S, b, rate, plaintext):
         ciphertext += (int_to_bytes(S[0], 8)[:min(8,p_lastlen)] + int_to_bytes(S[1], 8)[:max(0,p_lastlen-8)])
     if debug: printstate(S, "process plaintext:")
     return ciphertext
-
 
 def ascon_process_ciphertext(S, b, rate, ciphertext):
     c_lastlen = len(ciphertext) % rate
@@ -141,7 +137,6 @@ def ascon_process_ciphertext(S, b, rate, ciphertext):
     if debug: printstate(S, "process ciphertext:")
     return plaintext
 
-
 def ascon_finalize(S, rate, a, key):
     assert(len(key) in [16,20])
     S[rate//8+0] ^= bytes_to_int(key[0:8])
@@ -155,7 +150,6 @@ def ascon_finalize(S, rate, a, key):
     tag = int_to_bytes(S[3], 8) + int_to_bytes(S[4], 8)
     if debug: printstate(S, "finalization:")
     return tag
-
 
 # === Ascon permutation ===
 
@@ -185,7 +179,6 @@ def ascon_permutation(S, rounds=1):
         S[3] ^= rotr(S[3], 10) ^ rotr(S[3], 17)
         S[4] ^= rotr(S[4],  7) ^ rotr(S[4], 41)
         if debugpermutation: printwords(S, "linear diffusion layer:")
-
 
 # === helper functions ===
 

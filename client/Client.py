@@ -13,7 +13,6 @@ import time
 
 BUFSIZ = 1024 * 4
 
-
 class ClientApp:
     def __init__(self, client_id):
         self.client_socket = None
@@ -92,7 +91,6 @@ class ClientApp:
     def back(self, temp):
         temp.destroy()
         self.main_hp.tkraise()
-        self.app.geometry("480x230")
         self.app.geometry("480x230")
         self.client_socket.sendall(bytes("QUIT", "utf8"))
 
@@ -223,7 +221,6 @@ class ClientApp:
         self.showMainUI()
         self.app.mainloop()
 
-
 if __name__ == "__main__":
     try:
         login_register = LoginRegister()
@@ -235,7 +232,6 @@ if __name__ == "__main__":
         client_id = login_register.client_id
         client = ClientApp(client_id=client_id)
         client.generateMainUI()
-        client.app.mainloop()
         client.app.mainloop()
         client.connect()
     except:

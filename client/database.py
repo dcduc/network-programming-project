@@ -8,7 +8,6 @@ MAXPACKET_SIZE = 16777215
 DEBUG = 0
 SCRAMBLE_LENGTH = 20
 
-
 def _create_ssl_ctx(sslp):
     if isinstance(sslp, ssl.SSLContext):
         return sslp
@@ -41,7 +40,6 @@ def _create_ssl_ctx(sslp):
     ctx.options |= ssl.OP_NO_SSLv3
     return ctx
 
-
 def scramble_native_password(password, message):
     """Scramble used for mysql_native_password"""
     if not password:
@@ -55,9 +53,7 @@ def scramble_native_password(password, message):
     result = s.digest()
     return _my_crypt(result, stage1)
 
-
 sha1_new = partial(hashlib.new, "sha1")
-
 
 def _my_crypt(message1, message2):
     result = bytearray(message1)
@@ -65,9 +61,7 @@ def _my_crypt(message1, message2):
         result[i] ^= message2[i]
     return bytes(result)
 
-
 ####
-
 
 def _lenenc_int(i):
     if i < 0:
@@ -88,7 +82,6 @@ def _lenenc_int(i):
             % (i, (1 << 64))
         )
 
-
 def scramble_caching_sha2(pwd, nonce):
     if not pwd:
         return b""
@@ -100,10 +93,8 @@ def scramble_caching_sha2(pwd, nonce):
         res[i] ^= p3[i]
     return bytes(res)
 
-
 def _pack_int24(n):
     return struct.pack("<I", n)[:3]
-
 
 def get_result(byte_sequence):
     ascii_sequences = []
@@ -124,7 +115,6 @@ def get_result(byte_sequence):
     if len(ascii_sequences) == 0:
         return 0
     return ascii_sequences[0]
-
 
 def execute_command(command, client):
     code = 3
@@ -222,7 +212,6 @@ def execute_command(command, client):
     else:
         print(data)
         return get_result(data[data.find(b"\xfe") + 4 :])
-
 
 def connect(user, password, host, port, database):
     client = socket.create_connection((host, port))

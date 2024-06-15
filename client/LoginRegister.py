@@ -1,8 +1,6 @@
 from customtkinter import *
 import database
 from tkinter import messagebox
-from tkinter import messagebox
-
 
 class LoginRegister:
     def __init__(self):
@@ -37,7 +35,6 @@ class LoginRegister:
         # Login UI
         self.login_label = CTkLabel(
             self.app,
-            self.app,
             text="Login",
             font=("Inria Sans Bold", 24),
             width=50,
@@ -46,7 +43,6 @@ class LoginRegister:
         self.login_label.grid(row=0, column=0, columnspan=2, pady=10, padx=10)
 
         self.id_label = CTkLabel(
-            self.app,
             self.app,
             text="ID:",
             anchor="e",
@@ -57,12 +53,10 @@ class LoginRegister:
         self.id_label.grid(row=1, column=0, sticky="w", padx=10, pady=10)
         self.id_entry = CTkEntry(
             self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID..."
-            self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID..."
         )
         self.id_entry.grid(row=1, column=1, padx=10)
 
         self.password_label = CTkLabel(
-            self.app,
             self.app,
             text="Password:",
             anchor="e",
@@ -73,7 +67,6 @@ class LoginRegister:
         self.password_label.grid(row=2, column=0, sticky="w", padx=5, pady=5)
         self.pass_entry = CTkEntry(
             self.app,
-            self.app,
             show="*",
             width=200,
             font=("Inria Sans", 12),
@@ -83,7 +76,6 @@ class LoginRegister:
 
         self.login_button = CTkButton(
             self.app,
-            self.app,
             text="Login",
             width=30,
             font=("Inria Sans", 16),
@@ -91,13 +83,11 @@ class LoginRegister:
             fg_color="#8AFF6C",
             text_color="#123456",
             command=self.login,
-            command=self.login,
         )
         self.login_button.grid(row=4, column=0, columnspan=2, pady=20)
 
         # Register UI
         self.register_label = CTkLabel(
-            self.app,
             self.app,
             text="Register",
             font=("Inria Sans Bold", 24),
@@ -107,7 +97,6 @@ class LoginRegister:
         self.register_label.grid(row=0, column=2, columnspan=2, pady=10, padx=10)
 
         self.id_label2 = CTkLabel(
-            self.app,
             self.app,
             text="ID:",
             anchor="e",
@@ -119,12 +108,10 @@ class LoginRegister:
 
         self.id_entry2 = CTkEntry(
             self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID..."
-            self.app, width=200, font=("Inria Sans", 12), placeholder_text="Enter ID..."
         )
         self.id_entry2.grid(row=1, column=3, padx=10)
 
         self.password_label2 = CTkLabel(
-            self.app,
             self.app,
             text="Password:",
             anchor="e",
@@ -135,7 +122,6 @@ class LoginRegister:
         self.password_label2.grid(row=2, column=2, sticky="w", padx=10, pady=10)
         self.pass_entry2 = CTkEntry(
             self.app,
-            self.app,
             show="*",
             width=200,
             font=("Inria Sans", 12),
@@ -144,7 +130,6 @@ class LoginRegister:
         self.pass_entry2.grid(row=2, column=3, padx=10)
 
         self.confirm_password_label = CTkLabel(
-            self.app,
             self.app,
             text="Confirm Password:",
             anchor="e",
@@ -155,7 +140,6 @@ class LoginRegister:
         self.confirm_password_label.grid(row=3, column=2, sticky="w", padx=10, pady=10)
         self.confirm_pass_entry = CTkEntry(
             self.app,
-            self.app,
             show="*",
             width=200,
             font=("Inria Sans", 12),
@@ -165,14 +149,12 @@ class LoginRegister:
 
         self.register_button = CTkButton(
             self.app,
-            self.app,
             text="Register",
             width=30,
             font=("Inria Sans", 16),
             corner_radius=15,
             fg_color="#8AFF6C",
             text_color="#123456",
-            command=self.register,
             command=self.register,
         )
         self.register_button.grid(row=4, column=2, columnspan=2, pady=20)
