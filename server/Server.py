@@ -68,8 +68,13 @@ class ServerApp:
                 )
                 if f < 0:
                     print("Authentication failed!")
+                self.remotehost = database.execute_command(
+                    f"select ip_address from remote_desktop_app.vps where connections=(select min(connections) from vps)".encode(),
+                    socket_db,
+                )
+                print(self.remotehost)
                 mac_exists = database.execute_command(
-                    f"select mac_address from remote_desktop_app.servers where mac_address='00:00:00:00:00:01'".encode(),
+                    f"select mac_address from remote_desktop_app.servers where mac_address='{mac}'".encode(),
                     socket_db,
                 )
                 if not mac_exists:
@@ -80,7 +85,7 @@ class ServerApp:
                     if (
                         type(
                             database.execute_command(
-                                f"insert into remote_desktop_app.servers values ('{mac}','{self.id_server}','{self.passwd_server}',{self.localport})".encode(),
+                                f"insert into remote_desktop_app.servers (`mac_address`, `id`, `password`, `port`, `remote_address`) values ('{mac}','{self.id_server}','{self.passwd_server}',{self.localport}, '{self.remotehost}')".encode(),
                                 socket_db,
                             )
                         )
@@ -89,8 +94,12 @@ class ServerApp:
                         self.is_ready = True
                 else:
                     try:
+                        database.execute_command(
+                            f"update remote_desktop_app.servers set password='{self.passwd_server}', port={self.localport}, remote_address='{self.remotehost}' where mac_address='{mac}'".encode(),
+                            socket_db,
+                        )
                         self.id_server = database.execute_command(
-                            f"update remote_desktop_app.servers set password='{self.passwd_server}', port={self.localport}) where mac_address='{mac}'".encode(),
+                            f"select id from remote_desktop_app.servers where mac_address='{mac}'".encode(),
                             socket_db,
                         )
                         self.is_ready = True
@@ -292,7 +301,9 @@ class ServerApp:
             print("Waiting for connection...")
             client_socket, client_address = self.server_socket.accept()
             print(f"Connection from {client_address} has been established.")
-
+            database.execute_command(
+                f"update remote_desktop_app.vps set connections=connections+1 where ip_address='{self.remotehost}'",
+            )
             messagebox.showinfo(
                 "Connection", f"Connection from {client_address} has been established."
             )
