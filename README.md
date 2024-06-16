@@ -6,7 +6,7 @@
 
 | STT | Tiêu chí                 | Điểm số khi báo cáo | Bổ sung |
 | :-: | ------------------------ | :-----------------: | ------- |
-|  1  | App logic + Socket logic |          3          | [x]     |
+|  1  | App logic + Socket logic |          3          | - [x]   |
 |  2  | I/O (File, Network,...)  |         0.5         | [x]     |
 |  3  | Database                 |         0.5         |         |
 |  4  | Thread                   |         0.5         |         |
